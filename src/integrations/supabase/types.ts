@@ -14,16 +14,294 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      accounts: {
+        Row: {
+          balance: number
+          color: string
+          created_at: string
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["account_type"]
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          type?: Database["public"]["Enums"]["account_type"]
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["account_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          budget_limit: number | null
+          color: string
+          created_at: string
+          icon: string
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["category_type"]
+          user_id: string
+        }
+        Insert: {
+          budget_limit?: number | null
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name: string
+          type?: Database["public"]["Enums"]["category_type"]
+          user_id: string
+        }
+        Update: {
+          budget_limit?: number | null
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["category_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          currency_preference: string
+          email_notifications: boolean
+          full_name: string | null
+          id: string
+          monthly_budget_limit: number | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          currency_preference?: string
+          email_notifications?: boolean
+          full_name?: string | null
+          id: string
+          monthly_budget_limit?: number | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          currency_preference?: string
+          email_notifications?: boolean
+          full_name?: string | null
+          id?: string
+          monthly_budget_limit?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      recurring_rules: {
+        Row: {
+          account_id: string | null
+          active: boolean
+          amount: number
+          category_id: string | null
+          created_at: string
+          description: string | null
+          frequency: Database["public"]["Enums"]["recurring_frequency"]
+          id: string
+          next_due_date: string
+          type: Database["public"]["Enums"]["transaction_type"]
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          active?: boolean
+          amount: number
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          frequency?: Database["public"]["Enums"]["recurring_frequency"]
+          id?: string
+          next_due_date: string
+          type?: Database["public"]["Enums"]["transaction_type"]
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          active?: boolean
+          amount?: number
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          frequency?: Database["public"]["Enums"]["recurring_frequency"]
+          id?: string
+          next_due_date?: string
+          type?: Database["public"]["Enums"]["transaction_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_rules_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_rules_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_invites: {
+        Row: {
+          created_at: string
+          id: string
+          invited_email: string
+          role: Database["public"]["Enums"]["invite_role"]
+          status: Database["public"]["Enums"]["invite_status"]
+          token: string
+          workspace_owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_email: string
+          role?: Database["public"]["Enums"]["invite_role"]
+          status?: Database["public"]["Enums"]["invite_status"]
+          token?: string
+          workspace_owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_email?: string
+          role?: Database["public"]["Enums"]["invite_role"]
+          status?: Database["public"]["Enums"]["invite_status"]
+          token?: string
+          workspace_owner_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          account_id: string | null
+          amount: number
+          category_id: string | null
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          is_recurring: boolean
+          receipt_url: string | null
+          tags: string[]
+          type: Database["public"]["Enums"]["transaction_type"]
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount: number
+          category_id?: string | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          is_recurring?: boolean
+          receipt_url?: string | null
+          tags?: string[]
+          type?: Database["public"]["Enums"]["transaction_type"]
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          category_id?: string | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          is_recurring?: boolean
+          receipt_url?: string | null
+          tags?: string[]
+          type?: Database["public"]["Enums"]["transaction_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["invite_role"]
+          user_id: string
+          workspace_owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["invite_role"]
+          user_id: string
+          workspace_owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["invite_role"]
+          user_id?: string
+          workspace_owner_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_workspace_access: {
+        Args: { _owner: string; _user: string }
+        Returns: boolean
+      }
+      has_workspace_edit: {
+        Args: { _owner: string; _user: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      account_type: "checking" | "savings" | "credit" | "cash"
+      category_type: "income" | "expense"
+      invite_role: "viewer" | "editor"
+      invite_status: "pending" | "accepted" | "declined"
+      recurring_frequency: "daily" | "weekly" | "monthly" | "yearly"
+      transaction_type: "income" | "expense" | "transfer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +428,13 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      account_type: ["checking", "savings", "credit", "cash"],
+      category_type: ["income", "expense"],
+      invite_role: ["viewer", "editor"],
+      invite_status: ["pending", "accepted", "declined"],
+      recurring_frequency: ["daily", "weekly", "monthly", "yearly"],
+      transaction_type: ["income", "expense", "transfer"],
+    },
   },
 } as const
