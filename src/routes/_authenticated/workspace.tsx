@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Card } from "@/components/ui/card";
-import { Construction } from "lucide-react";
+import { PageHeader, ComingSoon } from "@/components/page-header";
 
 export const Route = createFileRoute("/_authenticated/workspace")({
   head: () => ({
@@ -12,16 +11,16 @@ export const Route = createFileRoute("/_authenticated/workspace")({
     ],
   }),
   component: () => (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Workspace</h1>
-      <Card className="flex flex-col items-center justify-center p-12 text-center">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary">
-          <Construction className="h-5 w-5" />
-        </div>
-        <p className="max-w-md text-sm text-muted-foreground">
-          Invite viewers and editors to your workspace in Phase 4.
-        </p>
-      </Card>
+    <div className="space-y-10">
+      <PageHeader
+        index="05"
+        title="Workspace"
+        subtitle="Shared books, with roles stated clearly."
+      />
+      <ComingSoon
+        note="Invite viewers and editors to a shared workspace, with role-scoped access enforced at the database level."
+        items={["Email invitations", "Viewer and editor roles", "Shared ledger access"]}
+      />
     </div>
   ),
 });

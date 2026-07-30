@@ -1,14 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowRight,
-  Wallet,
-  PieChart,
-  Receipt,
-  Users,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,116 +14,110 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-function Feature({ icon: Icon, title, desc }: { icon: any; title: string; desc: string }) {
+const FEATURES = [
+  { n: "01", title: "All accounts, one register", desc: "Bank, cash and credit balances read as a single figure." },
+  { n: "02", title: "Analysis, not decoration", desc: "Composition and trend, plotted with restraint." },
+  { n: "03", title: "Receipts on file", desc: "Attach documents to any entry; keep the paper trail." },
+  { n: "04", title: "Budgets stated in advance", desc: "Limits per category, measured against reality." },
+  { n: "05", title: "Shared books", desc: "Invite family or colleagues as viewers or editors." },
+  { n: "06", title: "Written insight", desc: "A short monthly note on what actually changed." },
+];
+
+function Wordmark() {
   return (
-    <div className="group rounded-2xl border bg-card p-6 transition-all hover:shadow-elegant hover:border-primary/40">
-      <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
-        <Icon className="h-5 w-5" />
-      </div>
-      <h3 className="text-base font-semibold text-foreground">{title}</h3>
-      <p className="mt-1.5 text-sm text-muted-foreground">{desc}</p>
-    </div>
+    <Link to="/" className="flex items-baseline gap-2">
+      <span className="font-mono text-base font-medium tracking-[-0.03em]">SPENDWISE</span>
+      <span className="h-1.5 w-1.5 bg-primary" />
+    </Link>
   );
 }
 
 function Landing() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Nav */}
-      <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Wallet className="h-4 w-4" />
-            </div>
-            <span className="text-lg font-bold tracking-tight">SpendWise</span>
-          </Link>
+      <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+          <Wordmark />
           <div className="flex items-center gap-2">
             <Link to="/auth">
               <Button variant="ghost" size="sm">Sign in</Button>
             </Link>
             <Link to="/auth" search={{ mode: "signup" }}>
-              <Button size="sm">Get started</Button>
+              <Button size="sm" className="rounded-none">Open an account</Button>
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-hero-gradient">
-        <div className="mx-auto max-w-6xl px-4 py-24 md:py-32">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              Smart expense tracking, built for real life
-            </div>
-            <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
-              See where your money goes.{" "}
-              <span className="text-gradient-brand">Take control.</span>
+      <section className="border-b border-border bg-ledger">
+        <div className="mx-auto grid max-w-6xl gap-12 px-5 py-20 md:grid-cols-12 md:py-32">
+          <div className="md:col-span-8">
+            <p className="label-eyebrow">Est. ledger — personal finance</p>
+            <h1 className="mt-6 text-4xl leading-[1.05] md:text-6xl">
+              See where your money goes.
+              <br />
+              <span className="text-primary">Then decide.</span>
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground md:text-lg">
-              SpendWise is a modern expense manager with budgets, receipts,
-              analytics, and shared workspaces — everything you need to master
-              your finances.
+            <p className="mt-8 max-w-xl text-base font-light leading-relaxed text-muted-foreground">
+              SpendWise keeps a serious record of your finances — accounts, budgets,
+              receipts and analysis — presented with the plainness of a well-kept book.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link to="/auth" search={{ mode: "signup" }}>
-                <Button size="lg" className="gap-2">
-                  Start free
-                  <ArrowRight className="h-4 w-4" />
+                <Button size="lg" className="gap-2 rounded-none">
+                  Start your ledger <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link to="/auth">
-                <Button size="lg" variant="outline">Sign in</Button>
+                <Button size="lg" variant="outline" className="rounded-none">Sign in</Button>
               </Link>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="mx-auto max-w-6xl px-4 py-20">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            Everything you need, nothing you don't
-          </h2>
-          <p className="mt-3 text-muted-foreground">
-            A focused toolkit for tracking, understanding, and optimizing every dollar.
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Feature icon={Wallet} title="All accounts, one view" desc="Bank, cash, credit — see your full picture in real time." />
-          <Feature icon={PieChart} title="Beautiful analytics" desc="Interactive charts to break down every category and trend." />
-          <Feature icon={Receipt} title="Receipt capture" desc="Drag & drop receipts and attach them to any transaction." />
-          <Feature icon={ShieldCheck} title="Budgets that adapt" desc="Set category limits and get alerted before you overspend." />
-          <Feature icon={Users} title="Shared workspaces" desc="Invite family or teammates as viewers or editors." />
-          <Feature icon={Sparkles} title="Automated insights" desc="Get plain-English callouts about your changing habits." />
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="mx-auto max-w-4xl px-4 pb-24">
-        <div className="rounded-3xl border bg-card p-10 text-center shadow-elegant">
-          <h3 className="text-2xl font-bold tracking-tight md:text-3xl">
-            Ready to take control of your money?
-          </h3>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            Create your free account in seconds. No credit card required.
-          </p>
-          <div className="mt-6">
-            <Link to="/auth" search={{ mode: "signup" }}>
-              <Button size="lg" className="gap-2">
-                Create your account
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+          <div className="flex flex-col justify-end gap-6 border-l border-border pl-6 md:col-span-4">
+            {[
+              ["Entries recorded", "Unlimited"],
+              ["Currencies", "11"],
+              ["Cost to begin", "Nothing"],
+            ].map(([k, v]) => (
+              <div key={k}>
+                <p className="label-eyebrow">{k}</p>
+                <p className="numeral mt-2 text-2xl">{v}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-border/50">
-        <div className="mx-auto max-w-6xl px-4 py-8 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} SpendWise. Built with care.
+      <section className="mx-auto max-w-6xl px-5 py-20">
+        <h2 className="rule-gold text-2xl md:text-3xl">Everything the book requires</h2>
+        <div className="mt-12 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((f) => (
+            <div key={f.n} className="bg-card p-8">
+              <span className="numeral text-xs text-primary">{f.n}</span>
+              <h3 className="mt-5 text-base">{f.title}</h3>
+              <p className="mt-2 text-sm font-light leading-relaxed text-muted-foreground">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-border">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 px-5 py-16">
+          <h3 className="max-w-md text-2xl leading-snug md:text-3xl">
+            Open the book. Keep it honest.
+          </h3>
+          <Link to="/auth" search={{ mode: "signup" }}>
+            <Button size="lg" className="gap-2 rounded-none">
+              Create your account <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      <footer>
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-8 text-xs font-light text-muted-foreground">
+          <span>© {new Date().getFullYear()} SpendWise</span>
+          <span className="label-eyebrow">Kept by hand</span>
         </div>
       </footer>
     </div>
