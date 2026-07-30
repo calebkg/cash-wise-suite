@@ -1,17 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatPercent } from "@/lib/format";
-import {
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-  PiggyBank,
-  Sparkles,
-} from "lucide-react";
+import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/page-header";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -58,36 +52,64 @@ async function fetchDashboard() {
   return { profile, totalBalance, income, expense, savings, savingsChange };
 }
 
-function KpiCard({
-  label, value, icon: Icon, accent, delta,
+function Stat({
+  label,
+  value,
+  note,
+  delta,
+  tone,
+  className,
+  large,
 }: {
-  label: string; value: string; icon: typeof Wallet;
-  accent?: "primary" | "income" | "expense"; delta?: number;
+  label: string;
+  value: string;
+  note?: string;
+  delta?: number;
+  tone?: "income" | "expense";
+  className?: string;
+  large?: boolean;
 }) {
-  const ring =
-    accent === "income" ? "bg-income/15 text-income" :
-    accent === "expense" ? "bg-expense/15 text-expense" :
-    "bg-primary/15 text-primary";
-
   return (
-    <Card className="p-5">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground">{label}</span>
-        <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg", ring)}>
-          <Icon className="h-4 w-4" />
-        </div>
+    <div className={cn("flex flex-col justify-between bg-card p-6 md:p-8", className)}>
+      <div className="flex items-start justify-between gap-4">
+        <span className="label-eyebrow">{label}</span>
+        {tone && (
+          <span
+            className={cn(
+              "flex h-6 w-6 items-center justify-center border",
+              tone === "income"
+                ? "border-income/40 text-income"
+                : "border-expense/40 text-expense",
+            )}
+          >
+            {tone === "income" ? (
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            ) : (
+              <ArrowDownRight className="h-3.5 w-3.5" />
+            )}
+          </span>
+        )}
       </div>
-      <div className="mt-3 text-2xl font-bold tracking-tight">{value}</div>
-      {typeof delta === "number" && (
-        <div className={cn(
-          "mt-1 flex items-center gap-1 text-xs",
-          delta >= 0 ? "text-income" : "text-expense",
-        )}>
-          {delta >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-          {formatPercent(Math.abs(delta))} vs last month
+      <div
+        className={cn(
+          "numeral mt-8 leading-none",
+          large ? "text-4xl md:text-6xl" : "text-2xl md:text-3xl",
+        )}
+      >
+        {value}
+      </div>
+      {(note || typeof delta === "number") && (
+        <div className="mt-4 flex items-center gap-2 border-t border-border pt-3 text-xs text-muted-foreground">
+          {typeof delta === "number" && (
+            <span className={cn("numeral", delta >= 0 ? "text-income" : "text-expense")}>
+              {delta >= 0 ? "+" : "−"}
+              {formatPercent(Math.abs(delta))}
+            </span>
+          )}
+          <span className="font-light">{note}</span>
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 
@@ -96,12 +118,13 @@ function Dashboard() {
 
   if (isLoading || !data) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-64" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28" />)}
+      <div className="space-y-8">
+        <Skeleton className="h-24 w-full" />
+        <div className="grid gap-px bg-border md:grid-cols-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className={cn("h-44", i === 0 && "md:col-span-2 md:row-span-2 md:h-full")} />
+          ))}
         </div>
-        <Skeleton className="h-64" />
       </div>
     );
   }
@@ -109,39 +132,80 @@ function Dashboard() {
   const { profile, totalBalance, income, expense, savings, savingsChange } = data;
   const currency = profile.currency_preference || "USD";
   const firstName = profile.full_name?.split(" ")[0] ?? "there";
+  const period = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
   return (
-    <div className="space-y-8">
-      <header>
-        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-          Welcome back, {firstName} 👋
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Here's what's happening with your money this month.
-        </p>
-      </header>
+    <div className="space-y-10">
+      <PageHeader
+        index="01"
+        title={`Good day, ${firstName}.`}
+        subtitle="A plain reading of where your money stands this period. No noise, no confetti."
+        action={
+          <div className="text-right">
+            <p className="label-eyebrow">Period</p>
+            <p className="numeral mt-2 text-sm">{period}</p>
+          </div>
+        }
+      />
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Total balance"    value={formatCurrency(totalBalance, currency)} icon={Wallet} accent="primary" />
-        <KpiCard label="Income this month" value={formatCurrency(income, currency)}       icon={TrendingUp} accent="income" />
-        <KpiCard label="Expenses this month" value={formatCurrency(expense, currency)}    icon={TrendingDown} accent="expense" />
-        <KpiCard label="Net savings"      value={formatCurrency(savings, currency)}       icon={PiggyBank} accent="primary" delta={savingsChange} />
+      <section className="grid gap-px border border-border bg-border md:grid-cols-3 md:grid-rows-2">
+        <Stat
+          className="md:col-span-2 md:row-span-2 bg-ledger"
+          label="Total balance across accounts"
+          value={formatCurrency(totalBalance, currency)}
+          note="Sum of all linked account balances"
+          large
+        />
+        <Stat
+          label="Income · this month"
+          value={formatCurrency(income, currency)}
+          tone="income"
+          note="Received"
+        />
+        <Stat
+          label="Expenses · this month"
+          value={formatCurrency(expense, currency)}
+          tone="expense"
+          note="Spent"
+        />
       </section>
 
-      <Card className="p-8">
-        <div className="mx-auto max-w-md text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <h2 className="text-lg font-semibold">You're all set!</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Your account is ready. Head over to <strong>Transactions</strong> to start
-            logging income and expenses, or set up <strong>Budgets</strong> to keep
-            spending on track. Charts, receipts, and workspace collaboration are
-            coming online next.
+      <section className="grid gap-px border border-border bg-border md:grid-cols-3">
+        <Stat
+          label="Net savings"
+          value={formatCurrency(savings, currency)}
+          delta={savingsChange}
+          note="vs. previous month"
+        />
+        <div className="bg-card p-6 md:p-8">
+          <p className="label-eyebrow">Savings rate</p>
+          <p className="numeral mt-8 text-2xl md:text-3xl">
+            {income > 0 ? formatPercent((savings / income) * 100) : "—"}
           </p>
+          <div className="mt-6 h-px w-full bg-border">
+            <div
+              className="h-px bg-primary"
+              style={{
+                width: `${income > 0 ? Math.max(0, Math.min(100, (savings / income) * 100)) : 0}%`,
+              }}
+            />
+          </div>
         </div>
-      </Card>
+        <div className="bg-card p-6 md:p-8">
+          <p className="label-eyebrow">Next entries</p>
+          <ol className="mt-6 space-y-3 text-sm font-light text-muted-foreground">
+            <li className="flex gap-3">
+              <span className="numeral text-xs text-primary">01</span> Record transactions
+            </li>
+            <li className="flex gap-3">
+              <span className="numeral text-xs text-primary">02</span> Define category budgets
+            </li>
+            <li className="flex gap-3">
+              <span className="numeral text-xs text-primary">03</span> Review monthly analytics
+            </li>
+          </ol>
+        </div>
+      </section>
     </div>
   );
 }
