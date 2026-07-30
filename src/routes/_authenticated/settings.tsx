@@ -13,6 +13,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { z } from "zod";
+import { PageHeader } from "@/components/page-header";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -88,11 +89,15 @@ function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Settings</h1>
+    <div className="space-y-10">
+      <PageHeader
+        index="06"
+        title="Settings"
+        subtitle="Your identity, currency, and correspondence preferences."
+      />
 
-      <Card className="max-w-2xl p-6">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Profile</h2>
+      <Card className="max-w-2xl rounded-none border-border p-8 shadow-none">
+        <h2 className="label-eyebrow mb-6">Profile</h2>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Full name</Label>
@@ -129,8 +134,8 @@ function SettingsPage() {
         </div>
       </Card>
 
-      <Card className="max-w-2xl p-6">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Security</h2>
+      <Card className="max-w-2xl rounded-none border-border p-8 shadow-none">
+        <h2 className="label-eyebrow mb-6">Security</h2>
         <Button variant="outline" onClick={changePassword}>Change password</Button>
       </Card>
     </div>
