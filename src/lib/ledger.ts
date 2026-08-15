@@ -7,7 +7,7 @@ export type TxType = "income" | "expense" | "transfer";
 export type Account = {
   id: string;
   name: string;
-  type: "cash" | "bank" | "credit_card" | "savings" | "investment";
+  type: "checking" | "savings" | "credit" | "cash";
   balance: number;
   color: string;
   created_at: string;
@@ -38,11 +38,10 @@ export type Transaction = {
 };
 
 export const ACCOUNT_TYPES = [
-  { value: "cash", label: "Cash" },
-  { value: "bank", label: "Bank" },
-  { value: "credit_card", label: "Credit card" },
+  { value: "checking", label: "Checking" },
   { value: "savings", label: "Savings" },
-  { value: "investment", label: "Investment" },
+  { value: "credit", label: "Credit" },
+  { value: "cash", label: "Cash" },
 ] as const;
 
 export const TX_TYPES = [
@@ -129,7 +128,7 @@ export function useSaveAccount() {
     async (values) => {
       const payload = {
         name: values.name!,
-        type: values.type ?? "bank",
+        type: values.type ?? "checking",
         balance: Number(values.balance ?? 0),
         color: values.color ?? "#c9a84c",
       };
