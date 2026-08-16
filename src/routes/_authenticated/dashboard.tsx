@@ -6,6 +6,7 @@ import { formatCurrency, formatPercent } from "@/lib/format";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
+import { DashboardCharts } from "@/components/dashboard-charts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -26,11 +27,19 @@ async function fetchDashboard() {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
 
-  const [profileRes, accountsRes, txThisRes, txLastRes] = await Promise.all([
+  const startOfWindow = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().slice(0, 10);
+
+  const [profileRes, accountsRes, txThisRes, txLastRes, windowRes, categoriesRes] = await Promise.all([
     supabase.from("profiles").select("full_name, currency_preference").maybeSingle(),
     supabase.from("accounts").select("balance"),
     supabase.from("transactions").select("amount, type").gte("date", startOfMonth),
     supabase.from("transactions").select("amount, type").gte("date", startOfLastMonth).lt("date", startOfMonth),
+    supabase
+      .from("transactions")
+      .select("amount, type, date, category_id, description")
+      .gte("date", startOfWindow)
+      .order("date", { ascending: false }),
+    supabase.from("categories").select("id, name"),
   ]);
 
   const profile = (profileRes.data as Profile | null) ?? { full_name: null, currency_preference: "USD" };
@@ -49,7 +58,53 @@ async function fetchDashboard() {
   const savingsChange =
     lastSavings === 0 ? (savings === 0 ? 0 : 100) : ((savings - lastSavings) / Math.abs(lastSavings)) * 100;
 
-  return { profile, totalBalance, income, expense, savings, savingsChange };
+  const windowRows = (windowRes.data ?? []) as any[];
+  const categoryNames = new Map<string, string>(
+    ((categoriesRes.data ?? []) as any[]).map((c) => [c.id, c.name]),
+  );
+
+  const months: { month: string; income: number; expense: number }[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const rows = windowRows.filter((r) => String(r.date).slice(0, 7) === key);
+    months.push({
+      month: d.toLocaleDateString("en-US", { month: "short" }),
+      income: sumBy(rows, "income"),
+      expense: sumBy(rows, "expense"),
+    });
+  }
+
+  const byCategory = new Map<string, number>();
+  for (const r of windowRows) {
+    if (r.type !== "expense") continue;
+    const name = r.category_id ? (categoryNames.get(r.category_id) ?? "Unassigned") : "Unassigned";
+    byCategory.set(name, (byCategory.get(name) ?? 0) + Number(r.amount ?? 0));
+  }
+  const categoryBreakdown = [...byCategory.entries()]
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 6);
+
+  const recent = windowRows.slice(0, 6).map((r) => ({
+    date: String(r.date),
+    description: r.description as string | null,
+    amount: Number(r.amount ?? 0),
+    type: String(r.type),
+    category: r.category_id ? (categoryNames.get(r.category_id) ?? null) : null,
+  }));
+
+  return {
+    profile,
+    totalBalance,
+    income,
+    expense,
+    savings,
+    savingsChange,
+    months,
+    categoryBreakdown,
+    recent,
+  };
 }
 
 function Stat({
@@ -129,7 +184,7 @@ function Dashboard() {
     );
   }
 
-  const { profile, totalBalance, income, expense, savings, savingsChange } = data;
+  const { profile, totalBalance, income, expense, savings, savingsChange, months, categoryBreakdown, recent } = data;
   const currency = profile.currency_preference || "USD";
   const firstName = profile.full_name?.split(" ")[0] ?? "there";
   const period = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
@@ -192,20 +247,35 @@ function Dashboard() {
           </div>
         </div>
         <div className="bg-card p-6 md:p-8">
-          <p className="label-eyebrow">Next entries</p>
-          <ol className="mt-6 space-y-3 text-sm font-light text-muted-foreground">
-            <li className="flex gap-3">
-              <span className="numeral text-xs text-primary">01</span> Record transactions
-            </li>
-            <li className="flex gap-3">
-              <span className="numeral text-xs text-primary">02</span> Define category budgets
-            </li>
-            <li className="flex gap-3">
-              <span className="numeral text-xs text-primary">03</span> Review monthly analytics
-            </li>
-          </ol>
+          <p className="label-eyebrow">Latest entries</p>
+          {recent.length === 0 ? (
+            <p className="mt-6 text-sm font-light text-muted-foreground">
+              Nothing recorded yet. Your most recent entries will be listed here.
+            </p>
+          ) : (
+            <ul className="mt-6 space-y-3">
+              {recent.map((r, i) => (
+                <li key={i} className="flex items-baseline justify-between gap-3 text-sm">
+                  <span className="truncate font-light text-muted-foreground">
+                    {r.description || r.category || "Untitled entry"}
+                  </span>
+                  <span
+                    className={cn(
+                      "numeral text-xs",
+                      r.type === "income" ? "text-income" : r.type === "expense" ? "text-expense" : "",
+                    )}
+                  >
+                    {r.type === "income" ? "+" : r.type === "expense" ? "−" : ""}
+                    {formatCurrency(r.amount, currency)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
+
+      <DashboardCharts months={months} categories={categoryBreakdown} currency={currency} />
     </div>
   );
 }
