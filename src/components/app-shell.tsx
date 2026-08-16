@@ -8,6 +8,7 @@ import {
   LineChart,
   Users,
   Settings,
+  Wallet,
   LogOut,
   Menu,
 } from "lucide-react";
@@ -29,13 +30,14 @@ type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
 const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/transactions", label: "Transactions", icon: ArrowLeftRight },
+  { to: "/accounts", label: "Accounts", icon: Wallet },
   { to: "/budgets", label: "Budgets", icon: Target },
   { to: "/analytics", label: "Analytics", icon: LineChart },
   { to: "/workspace", label: "Workspace", icon: Users },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
-const MOBILE_NAV = NAV.slice(0, 5);
+const MOBILE_NAV = [NAV[0], NAV[1], NAV[2], NAV[3], NAV[4]];
 
 function Wordmark() {
   return (
