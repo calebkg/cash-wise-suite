@@ -138,7 +138,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           </SheetContent>
         </Sheet>
         <Wordmark />
+        <div className="flex items-center">
+        <ThemeToggle />
         <DropdownMenu>
+
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
               <span className="flex h-7 w-7 items-center justify-center border border-border text-[10px] text-primary">
