@@ -159,6 +159,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
+
       </header>
 
       {/* Main content */}
