@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
+
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
 
@@ -103,17 +105,19 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="label-eyebrow px-6 pb-3">Ledger</p>
           <NavLinks />
         </div>
-        <div className="border-t border-sidebar-border p-4">
+        <div className="flex items-center justify-between gap-2 border-t border-sidebar-border p-4">
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start gap-2 rounded-none text-muted-foreground hover:text-foreground"
+            className="flex-1 justify-start gap-2 rounded-none text-muted-foreground hover:text-foreground"
             onClick={signOut}
           >
             <LogOut className="h-4 w-4" /> Sign out
           </Button>
+          <ThemeToggle className="rounded-none text-muted-foreground hover:text-foreground" />
         </div>
       </aside>
+
 
       {/* Top bar (mobile) */}
       <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-background/90 px-4 backdrop-blur md:hidden">
@@ -134,7 +138,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           </SheetContent>
         </Sheet>
         <Wordmark />
+        <div className="flex items-center">
+        <ThemeToggle />
         <DropdownMenu>
+
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
               <span className="flex h-7 w-7 items-center justify-center border border-border text-[10px] text-primary">
@@ -152,6 +159,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
+
       </header>
 
       {/* Main content */}
